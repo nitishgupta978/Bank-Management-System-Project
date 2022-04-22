@@ -1,98 +1,136 @@
 package com.bz.controller;
 
-import java.util.Scanner;
+import com.bz.comman.AccountType;
+import com.bz.comman.ScannerUtil;
 import com.bz.comman.Validation;
+import com.bz.interfaces.IAccountService;
 import com.bz.interfaces.ICustomerService;
+import com.bz.model.Account;
 import com.bz.model.Customer;
-import com.bz.services.CustomerServiceImpl;
+import com.bz.service.AccountServiceImpl;
+
 
 public class BankManagementApp {
-	static Scanner scanner= new Scanner(System.in);
-	
-	static ICustomerService customerService = new CustomerServiceImpl();
-	public static void registerCustomer() {
 
-		Customer customer = new Customer();
-//		System.out.println("Enter the Id");
-//		String id = scanner.next();
-//		Validation.CheckIdStartWithCapEndDigit(id);
-//		customer.setId(id);
+	static ICustomerService customerService = new com.bz.service.CustomerServiceImpl();
+	static IAccountService accountService = new AccountServiceImpl();
+	
+	public static void registerCustomer() {
 		
-		System.out.println("Enter the firstName");
-		String firstName = scanner.next();
-		Validation.CheckStartWithCap(firstName);
+		Customer customer = new Customer();
+		String firstName = ScannerUtil.getString("firstName");
+		Validation.checkStartWithCap(firstName);
 		customer.setFirstName(firstName);
 		
-		System.out.println("Enter the middleName");
-		String middleName = scanner.next();
-		Validation.CheckStartWithCap(middleName);
+		String middleName = ScannerUtil.getString("middleName");
+		Validation.checkStartWithCap(middleName);
 		customer.setMiddleName(middleName);
 		
-		System.out.println("Enter the lastName");
-		String lastName = scanner.next();
-		Validation.CheckStartWithCap(lastName);
+		String lastName = ScannerUtil.getString("lastName");
+		Validation.checkStartWithCap(lastName);
 		customer.setLastName(lastName);
 		
-		System.out.println("Enter the mobileNo");
-		String mobileNo = scanner.next();
-		Validation.CheckAllDigit(mobileNo);;
+		String mobileNo = ScannerUtil.getString("mobileNo");
+		Validation.checkMobileNo(mobileNo);
 		customer.setMobileNo(mobileNo);
 		
-		System.out.println("Enter the username");
-		String username = scanner.next();
-		Validation.CheckUserNameStartWithCap(username);
+		String username = ScannerUtil.getString("username");
 		customer.setUsername(username);
 		
-		System.out.println("Enter the password");
-		String password = scanner.next();
-		Validation.CheckpasswordStartWithCapEndDigit(password);
+		String password = ScannerUtil.getString("password");
 		customer.setPassword(password);
 		
-		System.out.println("Enter the email");
-		String email = scanner.next();
-		Validation.CheckEmailStartWithCapEndDigit(email);
+		String email = ScannerUtil.getString("email");
 		customer.setEmail(email);
 		
-		System.out.println("Enter the addressId");
-		String addressId = scanner.next();
-		Validation.CheckAddressStartWithCap(addressId);
-		customer.setAddressId( addressId);
-		
-		System.out.println("customer"+ customer);
-		customerService.add(customer);
-	
+		//method call
+		int id = customerService.register(customer);
+		System.out.println("Your Customer id is "+id);
 	}
 	
 	private static void showAllCustomer() {
-		// TODO Auto-generated method stub
 		System.out.println(customerService.getAllCustomers());
-		
-	}
-public static void main(String[] args) {
-	int ch=1;
-	do {
-	System.out.println("Welcome");
-	System.out.println("1 Register Customer");
-	System.out.println("2 Get All Customer");
-	System.out.println("(Enter your choise");
-	int choise = scanner.nextInt();
-	switch(choise) {
-	case 1:
-		registerCustomer();
-		break;
-	case 2:
-		showAllCustomer();
-		break;
-	default:
-		break;
 	}
 	
-	System.out.println("If you to Continew please Press 1..");
-ch = scanner.nextInt();
-}
-	while(ch==1);
-	System.out.println("Infailed");
-}
+	private static void openAccount() {
+		int custId = ScannerUtil.getInt("Customer Id");
+		System.out.println("List Account Type");
+		System.out.println("1 Saving Account");
+		System.out.println("2 Current Account");
+		
+		int choice = ScannerUtil.getInt("Acccount type...");
+		
+		AccountType accountType = AccountType.Basic;
+		switch (choice) {
+		case 1:
+			accountType = AccountType.Saving;
+			break;
+		case 2:
+			accountType = AccountType.Current;
+			break;
+		default:
+			break;
+		}
+		Account account = accountService.openAccount(custId, accountType, customerService);
+		System.out.println("New Account is Create ");
+		System.out.println("****************************************");
+		System.out.println("Account No :"+account.getAccountNo());
+		System.out.println("IFSC Code : "+account.getIfscNo());
+		System.out.println("Balance  :"+account.getBalance());
+		
+	}
+	
+	private static void debitBalance() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static void creditBalance() {
+		int custId = ScannerUtil.getInt("Customer id");
+		long accountNo = ScannerUtil.getLong("Account No");
+		double balance = ScannerUtil.getDouble("Balance");
+		double newBalance = accountService.creditBalance(custId, accountNo, balance, customerService);
+		System.out.println("*****************************************");
+		System.out.println("your New Balance is "+newBalance);
+		System.out.println("*****************************************");
+	}
+	
+	public static void main(String[] args) {
+		int ch = 1;
+		do {
+			
+			System.out.println("Welcome to Bank");
+			System.out.println("A - 1 Register Customer");
+			System.out.println("A - 2 Open Account");
+			System.out.println("A - 3 Credit Balance");
+			System.out.println("A - 4 Debit Balance");
+			int choice = ScannerUtil.getInt("choice...");
+			
+			switch (choice) {
+			case 1:
+				registerCustomer();
+				break;
+			case 2:
+				openAccount();
+				break;
+			case 3:
+				creditBalance();
+				break;
+			case 4:
+				debitBalance();
+				break;
+			default:
+				break;
+			}
+			
+			ch = ScannerUtil.getInt("Do you want to contineu.... press 1");
+		}while(ch == 1);
+	}
+	
 }
 
-
+//Customer( id, firstName, middleName, lastName, mobileNo, username, password, email, address _id)
+//Address(street, plotNo, town, taluka, district, state, pincode)
+//Account(accountNo, ifscNo, branchCode, accountType, balance, branchName, customer_id)
+//BankMangementDashboard
+//openAccount, debit, credit, banlanceEnquiry, tranferfund

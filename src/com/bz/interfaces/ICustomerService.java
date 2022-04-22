@@ -1,15 +1,17 @@
 package com.bz.interfaces;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import com.bz.exception.CustomException;
 import com.bz.model.Customer;
 
 public interface ICustomerService {
 
-	public void add(Customer customer);
+	public int register(Customer customer);
 	public void update(Customer customer);
-	public Customer search(int id);
+	public Customer search(int id) throws CustomException.CustomerNotFoundException;
 	public void delete(int id);
-	public ArrayList<Customer>getAllCustomers();
- 
+	public List<Customer> getAllCustomers();
 }
+ 
